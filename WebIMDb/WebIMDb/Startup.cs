@@ -28,6 +28,13 @@ namespace WebIMDb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => options.AddDefaultPolicy(builder =>
+            {
+                builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+            }));
+
             services.AddControllers();
 
             services.AddDbContext<WebIMDbContext>(options =>
@@ -42,7 +49,7 @@ namespace WebIMDb
                 {
                         Title = "REST API",
                         Version = "v1",
-                        Description = "API RESTful em desenvolvimento",
+                        Description = "API simulando o site IMDb para classificação de filmes",
                         Contact = new Microsoft.OpenApi.Models.OpenApiContact
                         {
                             Name = "Guilherme Alves de Oliveira",
@@ -63,6 +70,8 @@ namespace WebIMDb
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseSwagger();
 
