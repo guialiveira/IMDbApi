@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebIMDb.Data;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace WebIMDb
 {
@@ -34,6 +35,21 @@ namespace WebIMDb
 
                     builder =>
                        builder.MigrationsAssembly("WebIMDb")));
+
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1",
+                    new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                        Title = "REST API",
+                        Version = "v1",
+                        Description = "API RESTful em desenvolvimento",
+                        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+                        {
+                            Name = "Guilherme Alves de Oliveira",
+                            Url = new Uri("https://www.linkedin.com/in/guilherme-alves-498074b1/")
+                        }
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +63,17 @@ namespace WebIMDb
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>{
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "REST API");
+            });
+
+            var option = new RewriteOptions();
+            option.AddRedirect("^$","swagger");
+
+            app.UseRewriter(option);
 
             app.UseAuthorization();
 
