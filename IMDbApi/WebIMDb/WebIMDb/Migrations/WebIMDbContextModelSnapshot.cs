@@ -57,7 +57,7 @@ namespace WebIMDb.Migrations
 
             modelBuilder.Entity("WebIMDb.Model.Avaliacao", b =>
                 {
-                    b.HasOne("WebIMDb.Model.Filme", "Filme")
+                    b.HasOne("WebIMDb.Model.Filme", null)
                         .WithMany("Avaliacoes")
                         .HasForeignKey("FilmeId")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -24,7 +24,7 @@ namespace WebIMDb.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Avaliacao>> GetAvaliacao(int id)
         {
-            var avaliacao = _repo.GetAvaliacaoById(id);
+            var avaliacao =await _repo.GetAvaliacaoByIdAsync(id);
             if (avaliacao == null) return BadRequest("A Avaliacao não foi encontrado");
 
 
@@ -75,7 +75,7 @@ namespace WebIMDb.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Avaliacao>> DeleteAvaliacao(int id)
         {
-            var alu = _repo.GetAvaliacaoById(id);
+            var alu = await _repo.GetAvaliacaoByIdAsync(id);
             if (alu == null) return BadRequest("Avaliacao não encontrada");
 
             _repo.Delete(alu);

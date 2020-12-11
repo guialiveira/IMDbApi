@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using WebIMDb.Helpers;
 using WebIMDb.Model;
 
 namespace WebIMDb.Data
@@ -10,13 +12,8 @@ namespace WebIMDb.Data
         void Delete<T>(T entity) where T : class;
         bool SaveChanges();
 
-        Task<Filme[]> GetAllFilmesAsync(bool includeAvaliacao = false);
-        Filme[] GetAllFilmes(bool includeAvaliacao = false);
-        Task<Filme[]> GetAllFilmesByGeneroAsync(string genero, bool includeAvaliacao = false);
-        Filme[] GetAllFilmesByGenero(string genero, bool includeAvaliacao = false);
-        Task<Filme> GetFilmeByIdAsync(int FilmeId, bool includeAvaliacao = false);
-        Filme GetFilmeById(int FilmeId, bool includeAvaliacao = false);
+        Task<PageList<Filme>> GetAllFilmesAsync(PageParams pageParams);
+        Task<Filme> GetFilmeByIdAsync(int FilmeId);
         Task<Avaliacao> GetAvaliacaoByIdAsync(int AvaliacaoId);
-        Avaliacao GetAvaliacaoById(int AvaliacaoId);
     }
 }

@@ -10,11 +10,11 @@ namespace WebIMDb.Helpers
     {
         public WebIMDbProfile()
         {
-            CreateMap<Filme, FilmeDto>();
-                //.ForMember(
-                //    dest => dest.Nome,
-                //    opt => opt.MapFrom(src => $"")
-                //);
+            CreateMap<Filme, FilmeDto>()
+            .ForMember(
+                dest => dest.NotaMedia,
+                opt => opt.MapFrom(src => $"Somente na consulta por Id")
+            );
 
             CreateMap<FilmeDto, Filme>();
 

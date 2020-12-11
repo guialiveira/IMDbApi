@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebIMDb.Helpers;
 using WebIMDb.Model;
 
 namespace WebIMDb.Data
@@ -35,97 +36,44 @@ namespace WebIMDb.Data
             return (_context.SaveChanges() > 0);
         }
 
-
-
-        public async Task<Filme[]> GetAllFilmesAsync(bool includeAvaliacao = false)
+        public async Task<PageList<Filme>> GetAllFilmesAsync(PageParams pageParams)
         {
             IQueryable<Filme> query = _context.Filme;
 
-            if (includeAvaliacao)
-            {
-                query = query.Include(a => a.Avaliacoes);
-            }
+            //Ordenando por quantidade de votos e depois por ordem alfabética
+            query = query.AsNoTracking().OrderByDescending(a => a.Avaliacoes.Count).ThenBy(a => a.Nome);           
 
-            query = query.AsNoTracking().OrderBy(a => a.Id);
+            //filtro
+            if (!string.IsNullOrEmpty(pageParams.Nome))
+                query = query.Where(Filme => Filme.Nome
+                                                .ToUpper()
+                                                .Contains(pageParams.Nome.ToUpper()));
+            if (!string.IsNullOrEmpty(pageParams.Diretor))
+                query = query.Where(Filme => Filme.Diretor
+                                                .ToUpper()
+                                                .Contains(pageParams.Diretor.ToUpper()));
+            if (!string.IsNullOrEmpty(pageParams.Genero))
+                query = query.Where(Filme => Filme.Genero
+                                                .ToUpper()
+                                                .Contains(pageParams.Genero.ToUpper()));
 
-            return await query.ToArrayAsync();
+            return await PageList<Filme>.CreateAsync(query, pageParams.PageNumber, pageParams.PageSize);
         }
 
-        public Filme[] GetAllFilmes(bool includeAvaliacao = false)
+        public async Task<Filme> GetFilmeByIdAsync(int FilmeId)
         {
             IQueryable<Filme> query = _context.Filme;
 
-            if (includeAvaliacao)
-            {
-                query = query.Include(a => a.Avaliacoes);
-            }
-
-            query = query.AsNoTracking().OrderBy(a => a.Id);
-
-            return query.ToArray();
-        }
-        public async Task<Filme[]> GetAllFilmesByGeneroAsync(string genero, bool includeAvaliacao = false)
-        {
-            IQueryable<Filme> query = _context.Filme;
-
-            if (includeAvaliacao)
-            {
-                query = query.Include(a => a.Avaliacoes);
-            }
-
-            query = query.AsNoTracking()
-                         .OrderBy(a => a.Id)
-                         .Where(Filme => Filme.Genero == genero);
-
-            return await query.ToArrayAsync();
-        }
-        public Filme[] GetAllFilmesByGenero(string genero, bool includeAvaliacao = false)
-        {
-            IQueryable<Filme> query = _context.Filme;
-
-            if (includeAvaliacao)
-            {
-                query = query.Include(a => a.Avaliacoes);
-            }
-
-            query = query.AsNoTracking()
-                         .OrderBy(a => a.Id)
-                         .Where(Filme => Filme.Genero == genero);
-
-            return query.ToArray();
-        }
-
-        public async Task<Filme> GetFilmeByIdAsync(int FilmeId, bool includeAvaliacao = false)
-        {
-            IQueryable<Filme> query = _context.Filme;
-
-            if (includeAvaliacao)
-            {
-                query = query.Include(a => a.Avaliacoes);
-            }
-
+            //Inclui avaliações
+            query = query.Include(a => a.Avaliacoes);
+           
             query = query.AsNoTracking()
                          .OrderBy(a => a.Id)
                          .Where(Filme => Filme.Id == FilmeId);
 
             return await query.FirstOrDefaultAsync();
         }
-
-        public Filme GetFilmeById(int FilmeId, bool includeAvaliacao = false)
-        {
-            IQueryable<Filme> query = _context.Filme;
-
-            if (includeAvaliacao)
-            {
-                query = query.Include(a => a.Avaliacoes);
-            }
-
-            query = query.AsNoTracking()
-                         .OrderBy(a => a.Id)
-                         .Where(Filme => Filme.Id == FilmeId);
-
-            return query.FirstOrDefault();
-        }
+      
         public async Task<Avaliacao> GetAvaliacaoByIdAsync(int AvaliacaoId)
         {
             IQueryable<Avaliacao> query = _context.Avaliacao;
@@ -136,17 +84,6 @@ namespace WebIMDb.Data
                          .Where(Avaliacao => Avaliacao.Id == AvaliacaoId);
 
             return await query.FirstOrDefaultAsync();
-        }
-        public Avaliacao GetAvaliacaoById(int AvaliacaoId)
-        {
-            IQueryable<Avaliacao> query = _context.Avaliacao;
-
-
-            query = query.AsNoTracking()
-                         .OrderBy(a => a.Id)
-                         .Where(Avaliacao => Avaliacao.Id == AvaliacaoId);
-
-            return query.FirstOrDefault();
-        }
+        }        
     }
 }

@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using WebIMDb.Data;
 using WebIMDb.Dtos;
+using WebIMDb.Helpers;
 using WebIMDb.Model;
 
 namespace WebIMDb.Controllers
@@ -23,22 +24,31 @@ namespace WebIMDb.Controllers
             _repo = repo;
         }
 
-        // GET: api/Filmes
+        // GET: api/filmes?pageNumber=2&pageSize=2
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Filme>>> GetFilme()
+        public async Task<ActionResult<IEnumerable<Filme>>> GetFilme([FromQuery]PageParams pageParams)
         {
-            var result = await _repo.GetAllFilmesAsync();
-            return Ok(_mapper.Map<IEnumerable<FilmeDto>>(result));
+            var result = await _repo.GetAllFilmesAsync(pageParams);
+            var filmeDto = _mapper.Map<IEnumerable<FilmeDto>>(result);
+            Response.AddPagination(result.CurrentPage, result.PageSize, result.TotalCount, result.TotalPages);
+            return Ok(filmeDto);
         }
 
-        // GET: api/Filmes/5
+        // GET: api/filmes/id
         [HttpGet("{id}")]
         public async Task<ActionResult<Filme>> GetFilme(int id)
         {
-            var filme = await _repo.GetFilmeByIdAsync(id, true);
+            var filme = await _repo.GetFilmeByIdAsync(id);
             if (filme == null) return BadRequest("O Filme não foi encontrado");
 
             var filmeDto = _mapper.Map<FilmeDto>(filme);
+            int mont = 0;
+            foreach(Avaliacao nota in filmeDto.Avaliacoes)
+            {
+                mont =  mont + nota.Nota;
+            }
+            filmeDto.NotaMedia = Convert.ToString(mont / filmeDto.Avaliacoes.Count);
+            
             return Ok(filmeDto);
         }
 
@@ -82,7 +92,7 @@ namespace WebIMDb.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Filme>> DeleteFilme(int id)
         {
-            var alu = _repo.GetFilmeById(id);
+            var alu = await _repo.GetFilmeByIdAsync(id);
             if (alu == null) return BadRequest("Filme não encontrado");
 
             _repo.Delete(alu);
