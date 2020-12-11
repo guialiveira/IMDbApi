@@ -51,7 +51,7 @@ namespace WebIMDb
                 {
                         Title = "REST API",
                         Version = "v1",
-                        Description = "API simulando o site IMDb para classificação de filmes",
+                        Description = "Pelo fato de eu trabalhar em tempo interal não tive tempo de criar a autenticação com JWT no tempo da prova, mas eu já usei o mesmo em outros projetos que tenho aqui no git caso queiram conferir.",
                         Contact = new Microsoft.OpenApi.Models.OpenApiContact
                         {
                             Name = "Guilherme Alves de Oliveira",
